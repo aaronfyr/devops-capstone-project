@@ -125,87 +125,95 @@ class TestAccountService(TestCase):
             json=account.serialize(),
             content_type="test/html"
         )
-        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertEqual(response.status_code,
+                         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     # ADD YOUR TEST CASES HERE ...
     def test_read_an_account(self):
         """It should Read a single Account"""
         account = self._create_accounts(1)[0]
-       
+
         # make a call to self.client.get() to get the account
-        response = self.client.get(f"{BASE_URL}/{account.id}", content_type="application/json")
-       
+        response = self.client.get(f"{BASE_URL}/{account.id}",
+                                   content_type="application/json")
+
         # assert that the resp.status_code is status.HTTP_200_OK
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-       
+
         # get the data from resp.get_json()
         data = response.get_json()
-       
+
         # assert that data["name"] equals the account.name
         self.assertEqual(data["name"], account.name)
 
     def test_account_not_found(self):
         """It should not Read an Account that is not found"""
-        
-        # send a self.client.get() request to the BASE_URL with an invalid account number (e.g., 0)
+
+        # send a self.client.get() request to the BASE_URL
+        # with an invalid account number (e.g., 0)
         response = self.client.get(f"{BASE_URL}/0")
-        
+
         # assert that the resp.status_code is status.HTTP_404_NOT_FOUND
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     def test_get_account_list(self):
         """It should Get a list of Accounts"""
         self._create_accounts(5)
-       
+
         # send a self.client.get() request to the BASE_URL
         response = self.client.get(BASE_URL)
-        
+
         # assert that the resp.status_code is status.HTTP_200_OK
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         # get the data from resp.get_json()
         data = response.get_json()
-        
-        # assert that the len() of the data is 5 (the number of accounts you created)
+
+        # assert that the len() of the data is 5
+        # (the number of accounts you created)
         self.assertEqual(len(data), 5)
 
     def test_update_account(self):
         """It should Update an existing Account"""
-        
+
         # create an Account to update
         test_account = AccountFactory()
-        
-        # send a self.client.post() request to the BASE_URL with a json payload of test_account.serialize()
+
+        # send a self.client.post() request to the
+        # BASE_URL with a json payload of test_account.serialize()
         response = self.client.post(BASE_URL, json=test_account.serialize())
-        
+
         # assert that the resp.status_code is status.HTTP_201_CREATED
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        
+
         # update the account
         # get the data from resp.get_json() as new_account
         new_account = response.get_json()
-        
+
         # change new_account["name"] to something known
         new_account["name"] = "Something Known"
-        
-        # send a self.client.put() request to the BASE_URL with a json payload of new_account
-        response = self.client.put(f"{BASE_URL}/{new_account['id']}", json=new_account)
-        
+
+        # send a self.client.put() request to the
+        # BASE_URL with a json payload of new_account
+        response = self.client.put(f"{BASE_URL}/{new_account['id']}",
+                                   json=new_account)
+
         # assert that the resp.status_code is status.HTTP_200_OK
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         # get the data from resp.get_json() as updated_account
         updated_account = response.get_json()
-        
+
         # assert that the updated_account["name"] is whatever you changed it to
         self.assertEqual(updated_account["name"], "Something Known")
 
     def test_delete_account(self):
         """It should Delete an Account"""
         account = self._create_accounts(1)[0]
-        # send a self.client.delete() request to the BASE_URL with an id of an account
+        # send a self.client.delete() request to the
+        # BASE_URL with an id of an account
         response = self.client.delete(f"{BASE_URL}/{account.id}")
-        
+
         # assert that the resp.status_code is status.HTTP_204_NO_CONTENT
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -221,7 +229,8 @@ class TestAccountService(TestCase):
         headers = {
             'X-Frame-Options': 'SAMEORIGIN',
             'X-Content-Type-Options': 'nosniff',
-            'Content-Security-Policy': 'default-src \'self\'; object-src \'none\'',
+            'Content-Security-Policy':
+            'default-src \'self\'; object-src \'none\'',
             'Referrer-Policy': 'strict-origin-when-cross-origin'
         }
         for key, value in headers.items():
@@ -232,4 +241,5 @@ class TestAccountService(TestCase):
         response = self.client.get('/', environ_overrides=HTTPS_ENVIRON)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Check for the CORS header
-        self.assertEqual(response.headers.get('Access-Control-Allow-Origin'), '*')
+        self.assertEqual(response.headers.get
+                         ('Access-Control-Allow-Origin'), '*')
